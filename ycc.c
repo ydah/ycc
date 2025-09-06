@@ -142,8 +142,8 @@ Node* new_node_num(int val) {
 
 Node *expr();
 Node *mul();
+Node *unary();
 Node *primary();
-
 
 Node* expr() {
   Node* node = mul();
@@ -160,17 +160,29 @@ Node* expr() {
 }
 
 Node* mul() {
-  Node* node = primary();
+  Node* node = unary();
 
   for(;;) {
     if (consume('*')) {
-      node = new_binary(NODE_MUL, node, primary());
+      node = new_binary(NODE_MUL, node, unary());
     } else if (consume('/')) {
-      node = new_binary(NODE_DIV, node, primary());
+      node = new_binary(NODE_DIV, node, unary());
     } else {
       return node;
     }
   }
+}
+
+Node* unary() {
+  if (consume('+')) {
+    return unary();
+  }
+
+  if (consume('-')) {
+    return new_binary(NODE_SUB, new_node_num(0), unary());
+  }
+
+  return primary();
 }
 
 Node* primary() {
