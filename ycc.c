@@ -27,6 +27,7 @@ struct Token {
   Token *next;    // Next token
   int val;        // If kind is TOKEN_NUM, its value
   char *str;      // Token string
+  int len;        // Token length
 };
 
 struct Node {
@@ -60,15 +61,19 @@ void error_at(char *loc, char *fmt, ...) {
   exit(1);
 }
 
-bool consume(char op) {
-  if (token->kind != TOKEN_RESERVED || token->str[0] != op)
+bool consume(char* op) {
+  if (token->kind != TOKEN_RESERVED ||
+      strlen(op) != token->len ||
+      memcmp(token->str, op, token->len))
     return false;
   token = token->next;
   return true;
 }
 
-void expect(char op) {
-  if (token->kind != TOKEN_RESERVED || token->str[0] != op)
+void expect(char* op) {
+  if (token->kind != TOKEN_RESERVED ||
+      strlen(op) != token->len ||
+      memcmp(token->str, op, token->len))
     error_at(token->str, "Expected '%c'", op);
   token = token->next;
 }
@@ -105,12 +110,15 @@ Token *tokenize() {
 
     if (strchr("+-*/()", *p)) {
       cur = new_token(TOKEN_RESERVED, cur, p++);
+      cur->len = 1;
       continue;
     }
 
     if (isdigit(*p)) {
       cur = new_token(TOKEN_NUM, cur, p);
+      char* end = p;
       cur->val = strtol(p, &p, 10);
+      cur->len = p - end;
       continue;
     }
 
@@ -149,9 +157,9 @@ Node* expr() {
   Node* node = mul();
 
   for(;;) {
-    if (consume('+')) {
+    if (consume("+")) {
       node = new_binary(NODE_ADD, node, mul());
-    } else if (consume('-')) {
+    } else if (consume("-")) {
       node = new_binary(NODE_SUB, node, mul());
     } else {
       return node;
@@ -163,9 +171,9 @@ Node* mul() {
   Node* node = unary();
 
   for(;;) {
-    if (consume('*')) {
+    if (consume("*")) {
       node = new_binary(NODE_MUL, node, unary());
-    } else if (consume('/')) {
+    } else if (consume("/")) {
       node = new_binary(NODE_DIV, node, unary());
     } else {
       return node;
@@ -174,11 +182,11 @@ Node* mul() {
 }
 
 Node* unary() {
-  if (consume('+')) {
+  if (consume("+")) {
     return unary();
   }
 
-  if (consume('-')) {
+  if (consume("-")) {
     return new_binary(NODE_SUB, new_node_num(0), unary());
   }
 
@@ -186,9 +194,9 @@ Node* unary() {
 }
 
 Node* primary() {
-  if (consume('(')) {
+  if (consume("(")) {
     Node* node = expr();
-    expect(')');
+    expect(")");
     return node;
   }
 
