@@ -7,6 +7,7 @@
 
 typedef enum {
   TOKEN_RESERVED, // Symbol
+  TOKEN_IDENT,    // Identifier
   TOKEN_NUM,      // Integer
   TOKEN_EOF,      // End of file
 } TokenKind;
@@ -21,6 +22,8 @@ typedef enum {
   NODE_NE,  // !=
   NODE_LT,  // <
   NODE_LE,  // <=
+  NODE_ASSIGN, // =
+  NODE_LVAR,  // Local variable
 } NodeKind;
 
 typedef struct Token Token;
@@ -39,10 +42,12 @@ struct Node {
   Node* lhs;     // Left hand side
   Node* rhs;     // right hand side
   int val;       // Use only kind is NODE_NUM
+  int offset;    // Use only kind is NODE_LVAR
 };
 
 extern Token *token; // Current token
 extern char *user_input; // Input string
+extern Node* code[100]; // Abstract syntax tree
 
 /// codegen.c
 
@@ -51,5 +56,5 @@ void gen(Node* node);
 /// parse.c
 
 Token* tokenize();
-Node* expr();
+void program();
 void error(char *fmt, ...);

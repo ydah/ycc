@@ -30,6 +30,14 @@ bool consume(char* op) {
   return true;
 }
 
+Token* consume_ident() {
+  if (token->kind != TOKEN_IDENT)
+    return NULL;
+  Token *tok = token;
+  token = token->next;
+  return tok;
+}
+
 void expect(char* op) {
   if (token->kind != TOKEN_RESERVED ||
       strlen(op) != token->len ||
@@ -78,7 +86,7 @@ Token *tokenize() {
     }
 
     // Single-character operators
-    if (strchr("+-*/<>()", *p)) {
+    if (strchr("+-*/<>();=", *p)) {
       cur = new_token(TOKEN_RESERVED, cur, p++);
       cur->len = 1;
       continue;
@@ -89,6 +97,12 @@ Token *tokenize() {
       char* end = p;
       cur->val = strtol(p, &p, 10);
       cur->len = p - end;
+      continue;
+    }
+
+    if ('a' <= *p && *p <= 'z') {
+      cur = new_token(TOKEN_IDENT, cur, p++);
+      cur->len = 1;
       continue;
     }
 
@@ -118,7 +132,9 @@ Node* new_node_num(int val) {
   return node;
 }
 
+Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
@@ -126,8 +142,32 @@ Node *mul();
 Node *unary();
 Node *primary();
 
+void program() {
+  int i = 0;
+  while (!at_eof()) {
+    code[i++] = stmt();
+  }
+  code[i] = NULL;
+}
+
+Node* stmt() {
+  Node *node = expr();
+  expect(";");
+  return node;
+}
+
 Node* expr() {
-  return equality();
+  return assign();
+}
+
+Node* assign() {
+  Node* node = equality();
+
+  if (consume("=")) {
+    node = new_binary(NODE_ASSIGN, node, assign());
+  }
+
+  return node;
 }
 
 Node* equality() {
@@ -206,6 +246,14 @@ Node* primary() {
   if (consume("(")) {
     Node* node = expr();
     expect(")");
+    return node;
+  }
+
+  Token *tok = consume_ident();
+  if (tok) {
+    Node* node = calloc(1, sizeof(Node));
+    node->kind = NODE_LVAR;
+    node->offset = (tok->str[0] - 'a' + 1) * 8;
     return node;
   }
 
