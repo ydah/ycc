@@ -9,21 +9,23 @@ typedef enum {
   TOKEN_RESERVED, // Symbol
   TOKEN_IDENT,    // Identifier
   TOKEN_NUM,      // Integer
+  TOKEN_RETURN,   // "return"
   TOKEN_EOF,      // End of file
 } TokenKind;
 
 typedef enum {
-  NODE_ADD, // +
-  NODE_SUB, // -
-  NODE_MUL, // *
-  NODE_DIV, // /
-  NODE_NUM, // Number
-  NODE_EQ,  // ==
-  NODE_NE,  // !=
-  NODE_LT,  // <
-  NODE_LE,  // <=
+  NODE_ADD,    // +
+  NODE_SUB,    // -
+  NODE_MUL,    // *
+  NODE_DIV,    // /
+  NODE_NUM,    // Number
+  NODE_EQ,     // ==
+  NODE_NE,     // !=
+  NODE_LT,     // <
+  NODE_LE,     // <=
   NODE_ASSIGN, // =
-  NODE_LVAR,  // Local variable
+  NODE_LVAR,   // Local variable
+  NODE_RETURN, // "return"
 } NodeKind;
 
 typedef struct Token Token;

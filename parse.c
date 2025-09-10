@@ -31,7 +31,8 @@ LVar* find_lvar(Token* tok) {
 }
 
 bool consume(char* op) {
-  if (token->kind != TOKEN_RESERVED ||
+  if (!(token->kind == TOKEN_RESERVED ||
+       token->kind == TOKEN_RETURN) ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len))
     return false;
@@ -109,6 +110,14 @@ Token *tokenize() {
       continue;
     }
 
+    // return
+    if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
+      cur = new_token(TOKEN_RETURN, cur, p);
+      cur->len = 6;
+      p += 6;
+      continue;
+    }
+
     if (isdigit(*p)) {
       cur = new_token(TOKEN_NUM, cur, p);
       char* start = p;
@@ -171,8 +180,17 @@ void program() {
 }
 
 Node* stmt() {
-  Node *node = expr();
-  expect(";");
+  Node *node;
+  if (consume("return")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = NODE_RETURN;
+    node->lhs = expr();
+  } else {
+    node = expr();
+  }
+
+  if (!consume(";"))
+    error_at(token->str, "Expected ';'");
   return node;
 }
 
