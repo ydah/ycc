@@ -3,6 +3,7 @@
 char* user_input; // Input string
 Token* token; // Current token
 Node* code[100]; // Abstract syntax tree
+LVar* locals = NULL; // Local variable list
 
 int main(int argc, char **argv) {
   if (argc != 2) {

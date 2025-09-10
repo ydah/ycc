@@ -28,12 +28,13 @@ typedef enum {
 
 typedef struct Token Token;
 typedef struct Node Node;
+typedef struct LVar LVar;
 
 struct Token {
   TokenKind kind; // Token type
-  Token *next;    // Next token
+  Token* next;    // Next token
   int val;        // If kind is TOKEN_NUM, its value
-  char *str;      // Token string
+  char* str;      // Token string
   int len;        // Token length
 };
 
@@ -45,9 +46,17 @@ struct Node {
   int offset;    // Use only kind is NODE_LVAR
 };
 
-extern Token *token; // Current token
-extern char *user_input; // Input string
+struct LVar {
+  LVar* next;    // Next variable or NULL
+  char* name;    // Variable name
+  int len;       // Variable name length
+  int offset;    // Offset from RBP
+};
+
+extern Token* token; // Current token
+extern char* user_input; // Input string
 extern Node* code[100]; // Abstract syntax tree
+extern LVar* locals; // Local variable list
 
 /// codegen.c
 

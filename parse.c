@@ -21,6 +21,15 @@ void error_at(char *loc, char *fmt, ...) {
   exit(1);
 }
 
+LVar* find_lvar(Token* tok) {
+  for (LVar* var = locals; var; var = var->next) {
+    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len)) {
+      return var;
+    }
+  }
+  return NULL;
+}
+
 bool consume(char* op) {
   if (token->kind != TOKEN_RESERVED ||
       strlen(op) != token->len ||
@@ -64,6 +73,14 @@ Token *new_token(TokenKind kind, Token *cur, char *str) {
   return tok;
 }
 
+bool is_alpha(char c) {
+  return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || (c == '_');
+}
+
+bool is_alnum(char c) {
+  return is_alpha(c) || ('0' <= c && c <= '9');
+}
+
 Token *tokenize() {
   Token head;
   head.next = NULL;
@@ -94,15 +111,18 @@ Token *tokenize() {
 
     if (isdigit(*p)) {
       cur = new_token(TOKEN_NUM, cur, p);
-      char* end = p;
+      char* start = p;
       cur->val = strtol(p, &p, 10);
-      cur->len = p - end;
+      cur->len = p - start;
       continue;
     }
 
-    if ('a' <= *p && *p <= 'z') {
-      cur = new_token(TOKEN_IDENT, cur, p++);
-      cur->len = 1;
+    if (is_alpha(*p)) {
+      cur = new_token(TOKEN_IDENT, cur, p);
+      char* start = p;
+      while (is_alnum(*p))
+        p++;
+      cur->len = p - start;
       continue;
     }
 
@@ -253,7 +273,20 @@ Node* primary() {
   if (tok) {
     Node* node = calloc(1, sizeof(Node));
     node->kind = NODE_LVAR;
-    node->offset = (tok->str[0] - 'a' + 1) * 8;
+
+    LVar* lvar = find_lvar(tok);
+    if (lvar) {
+      node->offset = lvar->offset;
+    } else {
+      lvar = calloc(1, sizeof(LVar));
+      lvar->next = locals;
+      lvar->name = tok->str;
+      lvar->len = tok->len;
+      lvar->offset = locals ? locals->offset + 8 : 8;
+      node->offset = lvar->offset;
+      locals = lvar;
+    }
+
     return node;
   }
 

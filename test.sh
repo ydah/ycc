@@ -48,5 +48,6 @@ assert 0 '1>=2;'
 
 assert 3 'a=3;'
 assert 19 'a=3*5;a+4;'
+assert 13 'foo=3;bar=5;foo+bar*2;'
 
 echo OK
