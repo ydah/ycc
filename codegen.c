@@ -70,6 +70,11 @@ void gen(Node* node) {
     printf(".Lend%d:\n", e);
     return;
   }
+  else if (node->kind == NODE_BLOCK) {
+    for (Node* n = node->body; n; n = n->next)
+      gen(n);
+    return;
+  }
 
   switch (node->kind) {
   case NODE_NUM:

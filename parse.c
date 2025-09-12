@@ -223,6 +223,8 @@ Node* stmt() {
     node = calloc(1, sizeof(Node));
     node->kind = NODE_RETURN;
     node->lhs = expr();
+    expect(";");
+    return node;
   }
   else if (consume("if")) {
     node = calloc(1, sizeof(Node));
@@ -264,12 +266,23 @@ Node* stmt() {
     node->then = stmt();
     return node;
   }
-  else {
-    node = expr();
+  else if (consume("{")) {
+    Node head;
+    head.next = NULL;
+    Node *cur = &head;
+
+    while (!consume("}")) {
+      cur->next = stmt();
+      cur = cur->next;
+    }
+
+    node = new_node(NODE_BLOCK);
+    node->body = head.next;
+    return node;
   }
 
-  if (!consume(";"))
-    error_at(token->str, "Expected ';'");
+  node = expr();
+  expect(";");
   return node;
 }
 

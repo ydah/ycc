@@ -33,6 +33,7 @@ typedef enum {
   NODE_IF,     // "if"
   NODE_WHILE,  // "while"
   NODE_FOR,    // "for"
+  NODE_BLOCK,  // { ... }
 } NodeKind;
 
 typedef struct Token Token;
@@ -53,11 +54,13 @@ struct Node {
   Node* rhs;     // right hand side
   int val;       // Use only kind is NODE_NUM
   int offset;    // Use only kind is NODE_LVAR
-  Node* cond;   // Condition (for if, while, for)
-  Node* then;   // Then clause (for if, while, for)
-  Node* els;    // Else clause (for if)
-  Node* init;   // Initialization (for for)
-  Node* inc;    // Increment (for for)
+  Node* cond;    // Condition (for if, while, for)
+  Node* then;    // Then clause (for if, while, for)
+  Node* els;     // Else clause (for if)
+  Node* init;    // Initialization (for for)
+  Node* inc;     // Increment (for for)
+  Node* next;    // Next node (for block statements)
+  Node* body;    // Body (for functions)
 };
 
 struct LVar {

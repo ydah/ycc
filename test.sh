@@ -60,6 +60,7 @@ assert 3 'if (1) return 3; return 2;'
 assert 3 'if (2-1) return 3; return 2;'
 
 assert 10 'i=0;while(i<10)i=i+1;return i;'
+assert 55 'i=0;j=0;while(i<10){i=i+1;j=j+i;}return j;'
 assert 2 'i=0;for(i=0;i<3;i=i+1)j=i;return j;'
 assert 5 'i=0;for(i=0;i<3;i=i+1)j=i;return j+i;'
 assert 19 'for(i=0;i<10;i=i+1)j=i;return j+i;'
