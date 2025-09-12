@@ -10,6 +10,10 @@ typedef enum {
   TOKEN_IDENT,    // Identifier
   TOKEN_NUM,      // Integer
   TOKEN_RETURN,   // "return"
+  TOKEN_IF,       // "if"
+  TOKEN_ELSE,     // "else"
+  TOKEN_WHILE,    // "while"
+  TOKEN_FOR,      // "for"
   TOKEN_EOF,      // End of file
 } TokenKind;
 
@@ -26,6 +30,9 @@ typedef enum {
   NODE_ASSIGN, // =
   NODE_LVAR,   // Local variable
   NODE_RETURN, // "return"
+  NODE_IF,     // "if"
+  NODE_WHILE,  // "while"
+  NODE_FOR,    // "for"
 } NodeKind;
 
 typedef struct Token Token;
@@ -46,6 +53,11 @@ struct Node {
   Node* rhs;     // right hand side
   int val;       // Use only kind is NODE_NUM
   int offset;    // Use only kind is NODE_LVAR
+  Node* cond;   // Condition (for if, while, for)
+  Node* then;   // Then clause (for if, while, for)
+  Node* els;    // Else clause (for if)
+  Node* init;   // Initialization (for for)
+  Node* inc;    // Increment (for for)
 };
 
 struct LVar {

@@ -32,7 +32,10 @@ LVar* find_lvar(Token* tok) {
 
 bool consume(char* op) {
   if (!(token->kind == TOKEN_RESERVED ||
-       token->kind == TOKEN_RETURN) ||
+        token->kind == TOKEN_RETURN ||
+        token->kind == TOKEN_IF ||
+        token->kind == TOKEN_WHILE ||
+        token->kind == TOKEN_FOR) ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len))
     return false;
@@ -89,6 +92,7 @@ Token *tokenize() {
   char *p = user_input;
 
   while (*p) {
+    // Skip whitespace characters
     if (isspace(*p)) {
       p++;
       continue;
@@ -104,7 +108,7 @@ Token *tokenize() {
     }
 
     // Single-character operators
-    if (strchr("+-*/<>();=", *p)) {
+    if (strchr("+-*/<>(){};=", *p)) {
       cur = new_token(TOKEN_RESERVED, cur, p++);
       cur->len = 1;
       continue;
@@ -118,6 +122,39 @@ Token *tokenize() {
       continue;
     }
 
+    // if
+    if (strncmp(p, "if", 2) == 0 && !is_alnum(p[2])) {
+      cur = new_token(TOKEN_IF, cur, p);
+      cur->len = 2;
+      p += 2;
+      continue;
+    }
+
+    // else
+    if (strncmp(p, "else", 4) == 0 && !is_alnum(p[4])) {
+      cur = new_token(TOKEN_ELSE, cur, p);
+      cur->len = 4;
+      p += 4;
+      continue;
+    }
+
+    // while
+    if (strncmp(p, "while", 5) == 0 && !is_alnum(p[5])) {
+      cur = new_token(TOKEN_WHILE, cur, p);
+      cur->len = 5;
+      p += 5;
+      continue;
+    }
+
+    // for
+    if (strncmp(p, "for", 3) == 0 && !is_alnum(p[3])) {
+      cur = new_token(TOKEN_FOR, cur, p);
+      cur->len = 3;
+      p += 3;
+      continue;
+    }
+
+    // Number
     if (isdigit(*p)) {
       cur = new_token(TOKEN_NUM, cur, p);
       char* start = p;
@@ -126,6 +163,7 @@ Token *tokenize() {
       continue;
     }
 
+    // Identifier
     if (is_alpha(*p)) {
       cur = new_token(TOKEN_IDENT, cur, p);
       char* start = p;
@@ -185,7 +223,48 @@ Node* stmt() {
     node = calloc(1, sizeof(Node));
     node->kind = NODE_RETURN;
     node->lhs = expr();
-  } else {
+  }
+  else if (consume("if")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = NODE_IF;
+    expect("(");
+    node->cond = expr();
+    expect(")");
+    node->then = stmt();
+    if (consume("else")) {
+      node->els = stmt();
+    }
+    return node;
+  }
+  else if (consume("while")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = NODE_WHILE;
+    expect("(");
+    node->cond = expr();
+    expect(")");
+    node->then = stmt();
+    return node;
+  }
+  else if (consume("for")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = NODE_FOR;
+    expect("(");
+    if (!consume(";")) {
+      node->init = expr();
+      expect(";");
+    }
+    if (!consume(";")) {
+      node->cond = expr();
+      expect(";");
+    }
+    if (!consume(")")) {
+      node->inc = expr();
+      expect(")");
+    }
+    node->then = stmt();
+    return node;
+  }
+  else {
     node = expr();
   }
 

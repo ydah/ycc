@@ -1,5 +1,7 @@
 #include "ycc.h"
 
+int label_count = 0;
+
 void gen_lval(Node* node) {
   if (node->kind != NODE_LVAR)
     error("Left side of assignment is not a variable");
@@ -16,6 +18,56 @@ void gen(Node* node) {
     printf("  mov rsp, rbp\n");
     printf("  pop rbp\n");
     printf("  ret\n");
+    return;
+  }
+  else if (node->kind == NODE_IF) {
+    int c = label_count++;
+    int e = label_count++;
+    gen(node->cond);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    if (node->els) {
+      printf("  je .Lelse%d\n", e);
+    } else {
+      printf("  je .Lend%d\n", c);
+    }
+    gen(node->then);
+    printf("  jmp .Lend%d\n", c);
+    if (node->els) {
+      printf(".Lelse%d:\n", e);
+      gen(node->els);
+    }
+    printf(".Lend%d:\n", c);
+    return;
+  } else if (node->kind == NODE_WHILE) {
+    int c = label_count++;
+    int e = label_count++;
+    printf(".Lbegin%d:\n", c);
+    gen(node->cond);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je .Lend%d\n", e);
+    gen(node->then);
+    printf("  jmp .Lbegin%d\n", c);
+    printf(".Lend%d:\n", e);
+    return;
+  } else if (node->kind == NODE_FOR) {
+    int c = label_count++;
+    int e = label_count++;
+    if (node->init)
+      gen(node->init);
+    printf(".Lbegin%d:\n", c);
+    if (node->cond) {
+      gen(node->cond);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je .Lend%d\n", e);
+    }
+    gen(node->then);
+    if (node->inc)
+      gen(node->inc);
+    printf("  jmp .Lbegin%d\n", c);
+    printf(".Lend%d:\n", e);
     return;
   }
 

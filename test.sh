@@ -54,4 +54,14 @@ assert 8 'return 8;'
 assert 21 'a=3;return a*7;'
 assert 14 'foo = 3;bar = 5 * 6 - 8;return foo + bar / 2;'
 
+assert 3 'if (0) return 2; return 3;'
+assert 2 'if (1-1) return 3; return 2;'
+assert 3 'if (1) return 3; return 2;'
+assert 3 'if (2-1) return 3; return 2;'
+
+assert 10 'i=0;while(i<10)i=i+1;return i;'
+assert 2 'i=0;for(i=0;i<3;i=i+1)j=i;return j;'
+assert 5 'i=0;for(i=0;i<3;i=i+1)j=i;return j+i;'
+assert 19 'for(i=0;i<10;i=i+1)j=i;return j+i;'
+
 echo OK
