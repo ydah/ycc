@@ -399,11 +399,5 @@ Node* primary() {
     return node;
   }
 
-  if (consume("(")) {
-    Node* node = expr();
-    expect(")");
-    return node;
-  }
-
   return new_node_num(expect_number());
 }
