@@ -62,6 +62,9 @@ struct Node {
   Node* inc;     // Increment (for for)
   Node* next;    // Next node (for block statements)
   Node* body;    // Body (for functions)
+  Node* args;    // Arguments (for function calls)
+  char* funcname; // Function name (for function calls)
+  int argnum;    // Number of arguments (for function calls)
 };
 
 struct LVar {

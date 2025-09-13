@@ -76,7 +76,22 @@ void gen(Node* node) {
     return;
   }
   else if (node->kind == NODE_FUNCALL) {
-    printf("  call foo\n");
+    Node* args[6];
+    int count = 0;
+    for (Node* arg = node->args; arg && count < 6; arg = arg->next) {
+      args[count++] = arg;
+    }
+
+    for (int i = count - 1; i >= 0; i--) {
+      gen(args[i]);
+    }
+
+    static char* argreg[] = { "rdi", "rsi", "rdx", "rcx", "r8", "r9" };
+    for (int i = 0; i < count && i < 6; i++) {
+      printf("  pop %s\n", argreg[i]);
+    }
+    printf("  mov rax, 0\n");
+    printf("  call %s\n", node->funcname);
     printf("  push rax\n");
     return;
   }

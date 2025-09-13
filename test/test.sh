@@ -67,5 +67,7 @@ assert 5 'i=0;for(i=0;i<3;i=i+1)j=i;return j+i;'
 assert 19 'for(i=0;i<10;i=i+1)j=i;return j+i;'
 
 assert 5 'foo();'
+assert 8 'bar(8);'
+assert 6 'baz(1,2,3);'
 
 echo OK

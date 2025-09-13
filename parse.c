@@ -108,7 +108,7 @@ Token *tokenize() {
     }
 
     // Single-character operators
-    if (strchr("+-*/<>(){};=", *p)) {
+    if (strchr("+-*/<>(){};=,", *p)) {
       cur = new_token(TOKEN_RESERVED, cur, p++);
       cur->len = 1;
       continue;
@@ -378,8 +378,28 @@ Node* primary() {
   Token *tok = consume_ident();
   if (tok) {
     if (consume("(")) {
+      Node* node = new_node(NODE_FUNCALL);
+      node->funcname = calloc(1, tok->len + 1);
+      strncpy(node->funcname, tok->str, tok->len);
+      node->argnum = 0;
+      node->args = NULL;
+
+      if (consume(")")) {
+        return node;
+      }
+
+      node->args = expr();
+      node->argnum++;
+      Node* cur = node->args;
+
+      while (consume(",")) {
+        cur->next = expr();
+        node->argnum++;
+        cur = cur->next;
+      }
+
       expect(")");
-      return new_node(NODE_FUNCALL);
+      return node;
     }
 
     Node* node = new_node(NODE_LVAR);
