@@ -220,15 +220,13 @@ void program() {
 Node* stmt() {
   Node *node;
   if (consume("return")) {
-    node = calloc(1, sizeof(Node));
-    node->kind = NODE_RETURN;
+    Node* node = new_node(NODE_RETURN);
     node->lhs = expr();
     expect(";");
     return node;
   }
   else if (consume("if")) {
-    node = calloc(1, sizeof(Node));
-    node->kind = NODE_IF;
+    Node* node = new_node(NODE_IF);
     expect("(");
     node->cond = expr();
     expect(")");
@@ -239,8 +237,7 @@ Node* stmt() {
     return node;
   }
   else if (consume("while")) {
-    node = calloc(1, sizeof(Node));
-    node->kind = NODE_WHILE;
+    Node* node = new_node(NODE_WHILE);
     expect("(");
     node->cond = expr();
     expect(")");
@@ -248,8 +245,7 @@ Node* stmt() {
     return node;
   }
   else if (consume("for")) {
-    node = calloc(1, sizeof(Node));
-    node->kind = NODE_FOR;
+    Node* node = new_node(NODE_FOR);
     expect("(");
     if (!consume(";")) {
       node->init = expr();
