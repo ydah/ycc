@@ -381,9 +381,12 @@ Node* primary() {
 
   Token *tok = consume_ident();
   if (tok) {
-    Node* node = calloc(1, sizeof(Node));
-    node->kind = NODE_LVAR;
+    if (consume("(")) {
+      expect(")");
+      return new_node(NODE_FUNCALL);
+    }
 
+    Node* node = new_node(NODE_LVAR);
     LVar* lvar = find_lvar(tok);
     if (lvar) {
       node->offset = lvar->offset;
@@ -397,6 +400,12 @@ Node* primary() {
       locals = lvar;
     }
 
+    return node;
+  }
+
+  if (consume("(")) {
+    Node* node = expr();
+    expect(")");
     return node;
   }
 

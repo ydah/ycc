@@ -75,6 +75,11 @@ void gen(Node* node) {
       gen(n);
     return;
   }
+  else if (node->kind == NODE_FUNCALL) {
+    printf("  call foo\n");
+    printf("  push rax\n");
+    return;
+  }
 
   switch (node->kind) {
   case NODE_NUM:

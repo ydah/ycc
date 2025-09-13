@@ -3,8 +3,9 @@ assert() {
   expected="$1"
   input="$2"
 
+  cc -c ./test/test_helper.c -o test_helper.o
   ./ycc "$input" > tmp.s
-  cc -o tmp tmp.s
+  cc -o tmp tmp.s test_helper.o
   ./tmp
   actual="$?"
 
@@ -64,5 +65,7 @@ assert 55 'i=0;j=0;while(i<10){i=i+1;j=j+i;}return j;'
 assert 2 'i=0;for(i=0;i<3;i=i+1)j=i;return j;'
 assert 5 'i=0;for(i=0;i<3;i=i+1)j=i;return j+i;'
 assert 19 'for(i=0;i<10;i=i+1)j=i;return j+i;'
+
+assert 5 'foo();'
 
 echo OK

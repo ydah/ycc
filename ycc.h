@@ -34,6 +34,7 @@ typedef enum {
   NODE_WHILE,  // "while"
   NODE_FOR,    // "for"
   NODE_BLOCK,  // { ... }
+  NODE_FUNCALL, // Function call
 } NodeKind;
 
 typedef struct Token Token;
