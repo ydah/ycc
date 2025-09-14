@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+// Test counter for summary
+static int test_count = 0;
+static int passed_count = 0;
+
+// Function to execute a command and return its exit status
+int execute_command(const char* command) {
+    int status = system(command);
+    if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    }
+    return -1;
+}
+
+// Assert function that mirrors the bash script functionality
+void assert(int expected, const char* input) {
+    test_count++;
+
+    // Compile test helper
+    if (execute_command("cc -c ./test/test_helper.c -o test_helper.o") != 0) {
+        fprintf(stderr, "Failed to compile test_helper.c\n");
+        exit(1);
+    }
+
+    // Generate assembly with ycc compiler
+    char ycc_cmd[1024];
+    snprintf(ycc_cmd, sizeof(ycc_cmd), "./ycc \"%s\" > tmp.s", input);
+    if (execute_command(ycc_cmd) != 0) {
+        fprintf(stderr, "Failed to run ycc compiler for: %s\n", input);
+        exit(1);
+    }
+
+    // Compile the generated assembly with test helper
+    if (execute_command("cc -o tmp tmp.s test_helper.o") != 0) {
+        fprintf(stderr, "Failed to compile assembly for: %s\n", input);
+        exit(1);
+    }
+
+    // Run the compiled program and get exit code
+    int actual = execute_command("./tmp");
+
+    // Check the result
+    if (actual == expected) {
+        printf("%s => %d\n", input, actual);
+        fflush(stdout);
+        passed_count++;
+    } else {
+        printf("%s => %d expected, but got %d\n", input, expected, actual);
+        fflush(stdout);
+        exit(1);
+    }
+}
+
+int main() {
+    printf("Running YCC Compiler Tests...\n\n");
+
+    // Basic arithmetic tests
+    assert(0, "0;");
+    assert(42, "42;");
+    assert(21, "5+20-4;");
+    assert(41, " 12 + 34 - 5 ;");
+    assert(47, "5+6*7;");
+    assert(15, "5*(9-6);");
+    assert(4, "(3+5)/2;");
+    assert(10, "-10+20;");
+    assert(10, "- -10;");
+    assert(10, "- - +10;");
+
+    // Comparison operators
+    assert(0, "0==1;");
+    assert(1, "42==42;");
+    assert(1, "0!=1;");
+    assert(0, "42!=42;");
+
+    assert(1, "0<1;");
+    assert(0, "1<1;");
+    assert(0, "2<1;");
+    assert(1, "0<=1;");
+    assert(1, "1<=1;");
+    assert(0, "2<=1;");
+
+    assert(1, "1>0;");
+    assert(0, "1>1;");
+    assert(0, "1>2;");
+    assert(1, "1>=0;");
+    assert(1, "1>=1;");
+    assert(0, "1>=2;");
+
+    // Variable assignment
+    assert(3, "a=3;");
+    assert(19, "a=3*5;a+4;");
+    assert(13, "foo=3;bar=5;foo+bar*2;");
+
+    // Return statements
+    assert(8, "return 8;");
+    assert(21, "a=3;return a*7;");
+    assert(14, "foo = 3;bar = 5 * 6 - 8;return foo + bar / 2;");
+
+    // If statements
+    assert(3, "if (0) return 2; return 3;");
+    assert(2, "if (1-1) return 3; return 2;");
+    assert(3, "if (1) return 3; return 2;");
+    assert(3, "if (2-1) return 3; return 2;");
+
+    // While loops
+    assert(10, "i=0;while(i<10)i=i+1;return i;");
+    assert(55, "i=0;j=0;while(i<10){i=i+1;j=j+i;}return j;");
+
+    // For loops
+    assert(2, "i=0;for(i=0;i<3;i=i+1)j=i;return j;");
+    assert(5, "i=0;for(i=0;i<3;i=i+1)j=i;return j+i;");
+    assert(19, "for(i=0;i<10;i=i+1)j=i;return j+i;");
+
+    // Function calls
+    assert(5, "foo();");
+    assert(8, "bar(8);");
+    assert(6, "baz(1,2,3);");
+
+    // Print summary
+    printf("\n========================================\n");
+    printf("OK - All tests passed! (%d/%d)\n", passed_count, test_count);
+    printf("========================================\n");
+
+    // Clean up temporary files
+    execute_command("rm -f test_ycc tmp.s tmp test_helper.o");
+
+    return 0;
+}

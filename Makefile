@@ -8,7 +8,8 @@ ycc: $(OBJS)
 $(OBJS): ycc.h
 
 test: ycc
-				./test.sh
+				gcc -o test_ycc ./test/test_ycc.c
+				./test_ycc
 
 clean:
 				rm -f ycc *.o *~ tmp*
