@@ -31,9 +31,7 @@ LVar* find_lvar(Token* tok) {
 }
 
 bool consume(char* op) {
-    if (!(token->kind == TOKEN_RESERVED || token->kind == TOKEN_RETURN ||
-          token->kind == TOKEN_IF || token->kind == TOKEN_WHILE ||
-          token->kind == TOKEN_FOR) ||
+    if ((token->kind == TOKEN_IDENT || token->kind == TOKEN_NUM) ||
         strlen(op) != token->len || memcmp(token->str, op, token->len))
         return false;
     token = token->next;
