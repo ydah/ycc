@@ -128,6 +128,12 @@ int main() {
     assert (55, "main() { return fib(9); } fib(x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }");
     assert (21, "main() { return add6(1,2,3,4,5,6); } add6(a,b,c,d,e,f) { return a+b+c+d+e+f; }");
 
+    // Pointer and address-of tests
+    assert(3, "main() { a=3; return *&a; }");
+    assert(3, "main() { a=3; b=&a; return *b; }");
+    assert(5, "main() { a=3; b=&a; *b=5; return a; }");
+    assert(7, "main() { a=3; b=&a; c=&b; **c=7; return a; }");
+
     // Print summary
     printf("\n========================================\n");
     printf("OK - All tests passed! (%d/%d)\n", passed_count, test_count);

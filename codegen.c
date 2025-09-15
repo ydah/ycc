@@ -6,11 +6,16 @@ int label_count = 0;
 char* funcname;
 
 void gen_addr(Node* node) {
-    if (node->kind != NODE_VAR)
-        error("Left side of assignment is not a variable");
+    if (node->kind == NODE_VAR) {
+        printf("  lea rax, [rbp-%d]\n", node->var->offset);
+        printf("  push rax\n");
+        return;
+    } else if (node->kind == NODE_DEREF) {
+        gen(node->lhs);
+        return;
+    }
 
-    printf("  lea rax, [rbp-%d]\n", node->var->offset);
-    printf("  push rax\n");
+    error("Left side of assignment is not a variable");
 }
 
 void load() {
@@ -28,6 +33,10 @@ void store() {
 
 void gen(Node* node) {
     switch (node->kind) {
+        case NODE_ADDR: {
+            gen_addr(node->lhs);
+            return;
+        }
         case NODE_ASSIGN: {
             gen_addr(node->lhs);
             gen(node->rhs);
@@ -36,6 +45,11 @@ void gen(Node* node) {
         }
         case NODE_BLOCK: {
             for (Node* n = node->body; n; n = n->next) gen(n);
+            return;
+        }
+        case NODE_DEREF: {
+            gen(node->lhs);
+            load();
             return;
         }
         case NODE_EXPR_STMT: {

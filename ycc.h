@@ -38,6 +38,8 @@ typedef enum {
     NODE_BLOCK,      // { ... }
     NODE_FUNCALL,    // Function call
     NODE_EXPR_STMT,  // Expression statement
+    NODE_ADDR,       // Address-of (&)
+    NODE_DEREF,      // Dereference (*)
 } NodeKind;
 
 typedef struct Node Node;
@@ -112,3 +114,4 @@ extern char* user_input;  // Input string
 /// codegen.c
 
 void codegen(Function* prog);
+void gen(Node* node);
