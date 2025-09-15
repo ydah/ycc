@@ -84,6 +84,7 @@ typedef enum {
     TOKEN_ELSE,      // "else"
     TOKEN_WHILE,     // "while"
     TOKEN_FOR,       // "for"
+    TOKEN_TYPE,      // "int"
     TOKEN_EOF,       // End of file
 } TokenKind;
 
@@ -98,6 +99,7 @@ struct Token {
 
 void error(char* fmt, ...);
 void error_at(char* loc, char* fmt, ...);
+void error_tok(Token* tok, char* fmt, ...);
 bool consume(char* op);
 char* strndup(char* p, int len);
 Token* consume_ident();

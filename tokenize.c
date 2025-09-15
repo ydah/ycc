@@ -24,6 +24,18 @@ void error_at(char* loc, char* fmt, ...) {
     exit(1);
 }
 
+void error_tok(Token* tok, char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int pos = tok->str - user_input;
+    fprintf(stderr, "%s\n", user_input);
+    fprintf(stderr, "%*s", pos, "");  // Print pos spaces.
+    fprintf(stderr, "^ ");
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
 char* strndup(char* p, int len) {
     char* buf = malloc(len + 1);
     strncpy(buf, p, len);
@@ -95,6 +107,13 @@ Token* tokenize() {
         // Skip whitespace characters
         if (isspace(*p)) {
             p++;
+            continue;
+        }
+
+        // Type keyword
+        if (strncmp(p, "int", 3) == 0 && !is_alnum(p[3])) {
+            cur = new_token(TOKEN_TYPE, cur, p, 3);
+            p += 3;
             continue;
         }
 

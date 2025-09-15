@@ -92,14 +92,14 @@ int main() {
     assert(0, "main() { return 1>=2; }");
 
     // Variable assignment
-    assert(3, "main() { a=3; return a; }");
-    assert(19, "main() { a=3*5;return a+4; }");
-    assert(13, "main() { foo=3;bar=5;return foo+bar*2; }");
+    assert(3, "main() { int a; a=3; return a; }");
+    assert(19, "main() { int a; a=3*5;return a+4; }");
+    assert(13, "main() { int foo; int bar; foo=3;bar=5;return foo+bar*2; }");
 
     // Return statements
     assert(8, "main() { return 8; }");
-    assert(21, "main() { a=3;return a*7; }");
-    assert(14, "main() { foo = 3;bar = 5 * 6 - 8;return foo + bar / 2; }");
+    assert(21, "main() { int a; a=3;return a*7; }");
+    assert(14, "main() { int foo; int bar; foo = 3;bar = 5 * 6 - 8;return foo + bar / 2; }");
 
     // If statements
     assert(3, "main() { if (0) return 2; return 3; }");
@@ -108,13 +108,13 @@ int main() {
     assert(3, "main() { if (2-1) return 3; return 2; }");
 
     // While loops
-    assert(10, "main() { i=0;while(i<10)i=i+1;return i; }");
-    assert(55, "main() { i=0;j=0;while(i<10){i=i+1;j=j+i;}return j; }");
+    assert(10, "main() { int i;i=0;while(i<10)i=i+1;return i; }");
+    assert(55, "main() { int i;int j;i=0;j=0;while(i<10){i=i+1;j=j+i;}return j; }");
 
     // For loops
-    assert(2, "main() { i=0;for(i=0;i<3;i=i+1)j=i;return j; }");
-    assert(5, "main() { i=0;for(i=0;i<3;i=i+1)j=i;return j+i; }");
-    assert(19, "main() { for(i=0;i<10;i=i+1)j=i;return j+i; }");
+    assert(2, "main() { int i;int j;i=0;for(i=0;i<3;i=i+1)j=i;return j; }");
+    assert(5, "main() { int i;int j;i=0;for(i=0;i<3;i=i+1)j=i;return j+i; }");
+    assert(19, "main() { int i;int j;for(i=0;i<10;i=i+1)j=i;return j+i; }");
 
     // Function calls
     assert(5, "main() { return foo(); }");
@@ -129,10 +129,10 @@ int main() {
     assert (21, "main() { return add6(1,2,3,4,5,6); } add6(a,b,c,d,e,f) { return a+b+c+d+e+f; }");
 
     // Pointer and address-of tests
-    assert(3, "main() { a=3; return *&a; }");
-    assert(3, "main() { a=3; b=&a; return *b; }");
-    assert(5, "main() { a=3; b=&a; *b=5; return a; }");
-    assert(7, "main() { a=3; b=&a; c=&b; **c=7; return a; }");
+    assert(3, "main() { int a;a=3; return *&a; }");
+    assert(3, "main() { int a;int b;a=3; b=&a; return *b; }");
+    assert(5, "main() { int a;int b;a=3; b=&a; *b=5; return a; }");
+    assert(7, "main() { int a;int b;int c;a=3; b=&a; c=&b; **c=7; return a; }");
 
     // Print summary
     printf("\n========================================\n");

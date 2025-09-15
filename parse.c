@@ -173,6 +173,16 @@ Node* stmt() {
         Node* node = new_node(NODE_BLOCK);
         node->body = head.next;
         return node;
+    } else if (consume("int")) {
+        Token* tok = consume_ident();
+        if (!tok) error("expected an identifier after int");
+
+        Var* var = find_var(tok);
+        if (var) error_tok(tok, "redefinition of variable");
+
+        var = push_var(strndup(tok->str, tok->len));
+        expect(";");
+        return new_var(var);
     }
 
     Node* node = new_node(NODE_EXPR_STMT);
@@ -308,9 +318,7 @@ Node* primary() {
         }
 
         Var* var = find_var(tok);
-        if (!var) {
-            var = push_var(strndup(tok->str, tok->len));
-        }
+        if (!var) error_tok(tok, "undefined variable");
 
         return new_var(var);
     }
