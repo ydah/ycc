@@ -43,10 +43,15 @@ char* strndup(char* p, int len) {
     return buf;
 }
 
-bool consume(char* op) {
-    if ((token->kind == TOKEN_IDENT || token->kind == TOKEN_NUM) ||
-        strlen(op) != token->len || memcmp(token->str, op, token->len))
-        return false;
+Token* peek(char* s) {
+    if (token->kind != TOKEN_RESERVED || strlen(s) != token->len ||
+        memcmp(token->str, s, token->len))
+        return NULL;
+    return token;
+}
+
+bool consume(char* s) {
+    if (!peek(s)) return false;
     token = token->next;
     return true;
 }
@@ -58,18 +63,9 @@ Token* consume_ident() {
     return tok;
 }
 
-void expect(char* op) {
-    if (token->kind != TOKEN_RESERVED || strlen(op) != token->len ||
-        memcmp(token->str, op, token->len))
-        error_at(token->str, "Expected '%s'", op);
+void expect(char* s) {
+    if (!peek(s)) error_tok(token, "Expected '%s'", s);
     token = token->next;
-}
-
-bool expect_type() {
-    if (token->kind != TOKEN_TYPE)
-        error_at(token->str, "Expected 'int'");
-    token = token->next;
-    return true;
 }
 
 char* expect_ident() {
@@ -104,6 +100,22 @@ bool is_alpha(char c) {
 
 bool is_alnum(char c) { return is_alpha(c) || ('0' <= c && c <= '9'); }
 
+bool starts_with(char* p, char* q) { return strncmp(p, q, strlen(q)) == 0; }
+
+char* starts_with_reserved(char* p) {
+    static char* kw[] = {"return", "if", "else", "while", "for", "int"};
+    for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++) {
+        if (starts_with(p, kw[i]) && !is_alnum(p[strlen(kw[i])])) return kw[i];
+    }
+
+    static char* ops[] = {"==", "!=", "<=", ">="};
+    for (int i = 0; i < sizeof(ops) / sizeof(*ops); i++) {
+        if (starts_with(p, ops[i])) return ops[i];
+    }
+
+    return NULL;
+}
+
 Token* tokenize() {
     Token head;
     head.next = NULL;
@@ -117,59 +129,18 @@ Token* tokenize() {
             continue;
         }
 
-        // Type keyword
-        if (strncmp(p, "int", 3) == 0 && !is_alnum(p[3])) {
-            cur = new_token(TOKEN_TYPE, cur, p, 3);
-            p += 3;
-            continue;
-        }
-
-        // Multi-character operators
-        if (strncmp(p, "==", 2) == 0 || strncmp(p, "!=", 2) == 0 ||
-            strncmp(p, "<=", 2) == 0 || strncmp(p, ">=", 2) == 0) {
-            cur = new_token(TOKEN_RESERVED, cur, p, 2);
-            p += 2;
+        // Multi-character operators or keywords
+        char* kw = starts_with_reserved(p);
+        if (kw) {
+            int len = strlen(kw);
+            cur = new_token(TOKEN_RESERVED, cur, p, len);
+            p += len;
             continue;
         }
 
         // Single-character operators
         if (strchr("+-*/&<>(){};=,", *p)) {
             cur = new_token(TOKEN_RESERVED, cur, p++, 1);
-            continue;
-        }
-
-        // return
-        if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
-            cur = new_token(TOKEN_RETURN, cur, p, 6);
-            p += 6;
-            continue;
-        }
-
-        // if
-        if (strncmp(p, "if", 2) == 0 && !is_alnum(p[2])) {
-            cur = new_token(TOKEN_IF, cur, p, 2);
-            p += 2;
-            continue;
-        }
-
-        // else
-        if (strncmp(p, "else", 4) == 0 && !is_alnum(p[4])) {
-            cur = new_token(TOKEN_ELSE, cur, p, 4);
-            p += 4;
-            continue;
-        }
-
-        // while
-        if (strncmp(p, "while", 5) == 0 && !is_alnum(p[5])) {
-            cur = new_token(TOKEN_WHILE, cur, p, 5);
-            p += 5;
-            continue;
-        }
-
-        // for
-        if (strncmp(p, "for", 3) == 0 && !is_alnum(p[3])) {
-            cur = new_token(TOKEN_FOR, cur, p, 3);
-            p += 3;
             continue;
         }
 

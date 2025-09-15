@@ -5,12 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct Type Type;
+
 /// parse.c
 
 typedef struct Var Var;
 struct Var {
     char* name;  // Variable name
     int offset;  // Offset from RBP
+    Type* ty;    // Type of the variable
 };
 
 typedef struct VarList VarList;
@@ -40,6 +43,7 @@ typedef enum {
     NODE_EXPR_STMT,  // Expression statement
     NODE_ADDR,       // Address-of (&)
     NODE_DEREF,      // Dereference (*)
+    NODE_NULL,       // Empty statement
 } NodeKind;
 
 typedef struct Node Node;
@@ -55,6 +59,7 @@ struct Node {
     Node* init;      // Initialization (for for)
     Node* inc;       // Increment (for for)
     Node* next;      // Next node (for block statements)
+    Type* ty;        // Type, e.g. int or pointer to int
     Node* body;      // Body (for functions)
     Node* args;      // Arguments (for function calls)
     char* funcname;  // Function name (for function calls)
@@ -79,12 +84,6 @@ typedef enum {
     TOKEN_RESERVED,  // Symbol
     TOKEN_IDENT,     // Identifier
     TOKEN_NUM,       // Integer
-    TOKEN_RETURN,    // "return"
-    TOKEN_IF,        // "if"
-    TOKEN_ELSE,      // "else"
-    TOKEN_WHILE,     // "while"
-    TOKEN_FOR,       // "for"
-    TOKEN_TYPE,      // "int"
     TOKEN_EOF,       // End of file
 } TokenKind;
 
@@ -100,6 +99,7 @@ struct Token {
 void error(char* fmt, ...);
 void error_at(char* loc, char* fmt, ...);
 void error_tok(Token* tok, char* fmt, ...);
+Token* peek(char* s);
 bool consume(char* op);
 char* strndup(char* p, int len);
 Token* consume_ident();
@@ -113,6 +113,19 @@ Token* tokenize();
 
 extern Token* token;      // Current token
 extern char* user_input;  // Input string
+
+/// type.c
+
+typedef enum { TYPE_INT, TYPE_PTR } TypeKind;
+
+struct Type {
+    TypeKind kind;
+    struct Type* base; // Pointer to base type, e.g. int*
+};
+
+Type* int_type();
+Type* pointer_to(Type* base);
+void add_type(Function* prog);
 
 /// codegen.c
 

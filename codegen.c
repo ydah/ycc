@@ -114,9 +114,7 @@ void gen(Node* node) {
             printf(".Lend%d:\n", c);
             return;
         }
-        case NODE_VAR: {
-            gen_addr(node);
-            load();
+        case NODE_NULL: {
             return;
         }
         case NODE_NUM: {
@@ -142,6 +140,11 @@ void gen(Node* node) {
             printf(".Lend%d:\n", e);
             return;
         }
+        case NODE_VAR: {
+            gen_addr(node);
+            load();
+            return;
+        }
     }
 
     gen(node->lhs);
@@ -152,9 +155,13 @@ void gen(Node* node) {
 
     switch (node->kind) {
         case NODE_ADD:
+            if (node->ty->kind == TYPE_PTR)
+                printf("  imul rdi, 8\n");
             printf("  add rax, rdi\n");
             break;
         case NODE_SUB:
+            if (node->ty->kind == TYPE_PTR)
+                printf("  imul rdi, 8\n");
             printf("  sub rax, rdi\n");
             break;
         case NODE_MUL:
