@@ -1,7 +1,7 @@
 #include "ycc.h"
 
-char *user_input;    // Input string
-Token *token;        // Current token
+char* user_input;  // Input string
+Token* token;      // Current token
 
 void error(char* fmt, ...) {
     va_list ap;

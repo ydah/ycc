@@ -1,5 +1,7 @@
 #include "ycc.h"
 
+char* argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
 int label_count = 0;
 char* funcname;
 
@@ -188,6 +190,13 @@ void codegen(Function* prog) {
         printf("  push rbp\n");
         printf("  mov rbp, rsp\n");
         printf("  sub rsp, %d\n", fn->stack_size);
+
+        // Push arguments to stack
+        int arg_offset = 0;
+        for (VarList* vl = fn->params; vl; vl = vl->next) {
+            Var* var = vl->var;
+            printf("  mov [rbp-%d], %s\n", var->offset, argreg[arg_offset++]);
+        }
 
         for (Node* node = fn->node; node; node = node->next) gen(node);
 

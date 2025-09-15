@@ -9,30 +9,35 @@
 
 typedef struct Var Var;
 struct Var {
-    Var* next;   // Next variable or NULL
     char* name;  // Variable name
     int offset;  // Offset from RBP
 };
 
+typedef struct VarList VarList;
+struct VarList {
+    VarList* next;  // Next variable
+    Var* var;       // Variable
+};
+
 typedef enum {
-    NODE_ADD,      // +
-    NODE_SUB,      // -
-    NODE_MUL,      // *
-    NODE_DIV,      // /
-    NODE_NUM,      // Number
-    NODE_EQ,       // ==
-    NODE_NE,       // !=
-    NODE_LT,       // <
-    NODE_LE,       // <=
-    NODE_ASSIGN,   // =
-    NODE_VAR,      // Variable
-    NODE_RETURN,   // "return"
-    NODE_IF,       // "if"
-    NODE_WHILE,    // "while"
-    NODE_FOR,      // "for"
-    NODE_BLOCK,    // { ... }
-    NODE_FUNCALL,  // Function call
-    NODE_EXPR_STMT, // Expression statement
+    NODE_ADD,        // +
+    NODE_SUB,        // -
+    NODE_MUL,        // *
+    NODE_DIV,        // /
+    NODE_NUM,        // Number
+    NODE_EQ,         // ==
+    NODE_NE,         // !=
+    NODE_LT,         // <
+    NODE_LE,         // <=
+    NODE_ASSIGN,     // =
+    NODE_VAR,        // Variable
+    NODE_RETURN,     // "return"
+    NODE_IF,         // "if"
+    NODE_WHILE,      // "while"
+    NODE_FOR,        // "for"
+    NODE_BLOCK,      // { ... }
+    NODE_FUNCALL,    // Function call
+    NODE_EXPR_STMT,  // Expression statement
 } NodeKind;
 
 typedef struct Node Node;
@@ -56,11 +61,12 @@ struct Node {
 
 typedef struct Function Function;
 struct Function {
-    Function* next;  // Next function
-    char* name;      // Function name
-    Node* node;      // AST root
-    Var* locals;     // Local variable list
-    int stack_size;  // Total stack size needed for locals
+    Function* next;   // Next function
+    VarList* params;  // Function parameters
+    char* name;       // Function name
+    Node* node;       // AST root
+    VarList* locals;  // Local variable list
+    int stack_size;   // Total stack size needed for locals
 };
 
 Function* program();
