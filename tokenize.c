@@ -53,6 +53,14 @@ void expect(char* op) {
     token = token->next;
 }
 
+char* expect_ident() {
+    if (token->kind != TOKEN_IDENT)
+        error_at(token->str, "Expected an identifier");
+    char* s = strndup(token->str, token->len);
+    token = token->next;
+    return s;
+}
+
 int expect_number() {
     if (token->kind != TOKEN_NUM) error_at(token->str, "Expected a number");
     int val = token->val;

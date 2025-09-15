@@ -54,13 +54,16 @@ struct Node {
     int argnum;      // Number of arguments (for function calls)
 };
 
-typedef struct {
+typedef struct Function Function;
+struct Function {
+    Function* next;  // Next function
+    char* name;      // Function name
     Node* node;      // AST root
     Var* locals;     // Local variable list
     int stack_size;  // Total stack size needed for locals
-} Program;
+};
 
-Program* program();
+Function* program();
 
 // tokenize.c
 
@@ -92,6 +95,7 @@ char* strndup(char* p, int len);
 Token* consume_ident();
 void expect(char* op);
 int expect_number();
+char* expect_ident();
 bool at_eof();
 Token* new_token(TokenKind kind, Token* cur, char* str, int len);
 Token* tokenize();
@@ -101,4 +105,4 @@ extern char* user_input;  // Input string
 
 /// codegen.c
 
-void codegen(Program* prog);
+void codegen(Function* prog);

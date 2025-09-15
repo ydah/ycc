@@ -1,6 +1,7 @@
 #include "ycc.h"
 
 int label_count = 0;
+char* funcname;
 
 void gen_addr(Node* node) {
     if (node->kind != NODE_VAR)
@@ -109,7 +110,7 @@ void gen(Node* node) {
         case NODE_RETURN: {
             gen(node->lhs);
             printf("  pop rax\n");
-            printf("  jmp .Lreturn\n");
+            printf("  jmp .Lreturn%s\n", funcname);
             return;
         }
         case NODE_WHILE: {
@@ -175,22 +176,25 @@ void gen(Node* node) {
     printf("  push rax\n");
 }
 
-void codegen(Program* prog) {
+void codegen(Function* prog) {
     printf(".intel_syntax noprefix\n");
-    printf(".global main\n");
-    printf("main:\n");
 
-    // Prologue
-    printf("  push rbp\n");
-    printf("  mov rbp, rsp\n");
-    printf("  sub rsp, %d\n", prog->stack_size);
-    printf("  mov rax, 0\n");
+    for (Function* fn = prog; fn; fn = fn->next) {
+        funcname = fn->name;
+        printf(".global %s\n", funcname);
+        printf("%s:\n", funcname);
 
-    for (Node* node = prog->node; node; node = node->next) gen(node);
+        // Prologue
+        printf("  push rbp\n");
+        printf("  mov rbp, rsp\n");
+        printf("  sub rsp, %d\n", fn->stack_size);
 
-    // Epilogue
-    printf(".Lreturn:\n");
-    printf("  mov rsp, rbp\n");
-    printf("  pop rbp\n");
-    printf("  ret\n");
+        for (Node* node = fn->node; node; node = node->next) gen(node);
+
+        // Epilogue
+        printf(".Lreturn%s:\n", funcname);
+        printf("  mov rsp, rbp\n");
+        printf("  pop rbp\n");
+        printf("  ret\n");
+    }
 }

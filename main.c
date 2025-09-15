@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
     user_input = argv[1];
     token = tokenize();
-    Program* prog = program();
+    Function* prog = program();
 
     int offset = 0;
     for (Var* var = prog->locals; var; var = var->next) {
