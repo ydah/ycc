@@ -65,6 +65,13 @@ void expect(char* op) {
     token = token->next;
 }
 
+bool expect_type() {
+    if (token->kind != TOKEN_TYPE)
+        error_at(token->str, "Expected 'int'");
+    token = token->next;
+    return true;
+}
+
 char* expect_ident() {
     if (token->kind != TOKEN_IDENT)
         error_at(token->str, "Expected an identifier");

@@ -105,6 +105,7 @@ char* strndup(char* p, int len);
 Token* consume_ident();
 void expect(char* op);
 int expect_number();
+bool expect_type();
 char* expect_ident();
 bool at_eof();
 Token* new_token(TokenKind kind, Token* cur, char* str, int len);

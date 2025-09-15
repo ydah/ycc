@@ -83,12 +83,14 @@ VarList* read_func_params() {
         return NULL;
     }
 
+    expect_type();
     VarList* head = calloc(1, sizeof(VarList));
     head->var = push_var(expect_ident());
     VarList* cur = head;
 
     while (!consume(")")) {
         expect(",");
+        expect_type();
         cur->next = calloc(1, sizeof(VarList));
         cur = cur->next;
         cur->var = push_var(expect_ident());
@@ -101,6 +103,7 @@ Function* function() {
     locals = NULL;
 
     Function* fn = calloc(1, sizeof(Function));
+    expect_type();
     fn->name = expect_ident();
     expect("(");
     fn->params = read_func_params();

@@ -60,79 +60,79 @@ int main() {
     printf("Running YCC Compiler Tests...\n\n");
 
     // Basic arithmetic tests
-    assert(0, "main() { return 0; }");
-    assert(42, "main() { return 42; }");
-    assert(21, "main() { return 5+20-4; }");
-    assert(41, "main() { return  12 + 34 - 5 ; }");
-    assert(47, "main() { return 5+6*7; }");
-    assert(15, "main() { return 5*(9-6); }");
-    assert(4, "main() { return (3+5)/2; }");
-    assert(10, "main() { return -10+20; }");
-    assert(10, "main() { return - -10; }");
-    assert(10, "main() { return - - +10; }");
+    assert(0, "int main() { return 0; }");
+    assert(42, "int main() { return 42; }");
+    assert(21, "int main() { return 5+20-4; }");
+    assert(41, "int main() { return  12 + 34 - 5 ; }");
+    assert(47, "int main() { return 5+6*7; }");
+    assert(15, "int main() { return 5*(9-6); }");
+    assert(4, "int main() { return (3+5)/2; }");
+    assert(10, "int main() { return -10+20; }");
+    assert(10, "int main() { return - -10; }");
+    assert(10, "int main() { return - - +10; }");
 
     // Comparison operators
-    assert(0, "main() { return 0==1; }");
-    assert(1, "main() { return 42==42; }");
-    assert(1, "main() { return 0!=1; }");
-    assert(0, "main() { return 42!=42; }");
+    assert(0, "int main() { return 0==1; }");
+    assert(1, "int main() { return 42==42; }");
+    assert(1, "int main() { return 0!=1; }");
+    assert(0, "int main() { return 42!=42; }");
 
-    assert(1, "main() { return 0<1; }");
-    assert(0, "main() { return 1<1; }");
-    assert(0, "main() { return 2<1; }");
-    assert(1, "main() { return 0<=1; }");
-    assert(1, "main() { return 1<=1; }");
-    assert(0, "main() { return 2<=1; }");
+    assert(1, "int main() { return 0<1; }");
+    assert(0, "int main() { return 1<1; }");
+    assert(0, "int main() { return 2<1; }");
+    assert(1, "int main() { return 0<=1; }");
+    assert(1, "int main() { return 1<=1; }");
+    assert(0, "int main() { return 2<=1; }");
 
-    assert(1, "main() { return 1>0; }");
-    assert(0, "main() { return 1>1; }");
-    assert(0, "main() { return 1>2; }");
-    assert(1, "main() { return 1>=0; }");
-    assert(1, "main() { return 1>=1; }");
-    assert(0, "main() { return 1>=2; }");
+    assert(1, "int main() { return 1>0; }");
+    assert(0, "int main() { return 1>1; }");
+    assert(0, "int main() { return 1>2; }");
+    assert(1, "int main() { return 1>=0; }");
+    assert(1, "int main() { return 1>=1; }");
+    assert(0, "int main() { return 1>=2; }");
 
     // Variable assignment
-    assert(3, "main() { int a; a=3; return a; }");
-    assert(19, "main() { int a; a=3*5;return a+4; }");
-    assert(13, "main() { int foo; int bar; foo=3;bar=5;return foo+bar*2; }");
+    assert(3, "int main() { int a; a=3; return a; }");
+    assert(19, "int main() { int a; a=3*5;return a+4; }");
+    assert(13, "int main() { int foo; int bar; foo=3;bar=5;return foo+bar*2; }");
 
     // Return statements
-    assert(8, "main() { return 8; }");
-    assert(21, "main() { int a; a=3;return a*7; }");
-    assert(14, "main() { int foo; int bar; foo = 3;bar = 5 * 6 - 8;return foo + bar / 2; }");
+    assert(8, "int main() { return 8; }");
+    assert(21, "int main() { int a; a=3;return a*7; }");
+    assert(14, "int main() { int foo; int bar; foo = 3;bar = 5 * 6 - 8;return foo + bar / 2; }");
 
     // If statements
-    assert(3, "main() { if (0) return 2; return 3; }");
-    assert(2, "main() { if (1-1) return 3; return 2; }");
-    assert(3, "main() { if (1) return 3; return 2; }");
-    assert(3, "main() { if (2-1) return 3; return 2; }");
+    assert(3, "int main() { if (0) return 2; return 3; }");
+    assert(2, "int main() { if (1-1) return 3; return 2; }");
+    assert(3, "int main() { if (1) return 3; return 2; }");
+    assert(3, "int main() { if (2-1) return 3; return 2; }");
 
     // While loops
-    assert(10, "main() { int i;i=0;while(i<10)i=i+1;return i; }");
-    assert(55, "main() { int i;int j;i=0;j=0;while(i<10){i=i+1;j=j+i;}return j; }");
+    assert(10, "int main() { int i;i=0;while(i<10)i=i+1;return i; }");
+    assert(55, "int main() { int i;int j;i=0;j=0;while(i<10){i=i+1;j=j+i;}return j; }");
 
     // For loops
-    assert(2, "main() { int i;int j;i=0;for(i=0;i<3;i=i+1)j=i;return j; }");
-    assert(5, "main() { int i;int j;i=0;for(i=0;i<3;i=i+1)j=i;return j+i; }");
-    assert(19, "main() { int i;int j;for(i=0;i<10;i=i+1)j=i;return j+i; }");
+    assert(2, "int main() { int i;int j;i=0;for(i=0;i<3;i=i+1)j=i;return j; }");
+    assert(5, "int main() { int i;int j;i=0;for(i=0;i<3;i=i+1)j=i;return j+i; }");
+    assert(19, "int main() { int i;int j;for(i=0;i<10;i=i+1)j=i;return j+i; }");
 
     // Function calls
-    assert(5, "main() { return foo(); }");
-    assert(8, "main() { return bar(8); }");
-    assert(6, "main() { return baz(1,2,3); }");
+    assert(5, "int main() { return foo(); }");
+    assert(8, "int main() { return bar(8); }");
+    assert(6, "int main() { return baz(1,2,3); }");
 
     // Define functions and call them
-    assert (32, "main() { return ret32(); } ret32() { return 32; }");
-    assert (7, "main() { return add2(3,4); } add2(x,y) { return x+y; }");
-    assert (1, "main() { return sub2(4,3); } sub2(x,y) { return x-y; }");
-    assert (55, "main() { return fib(9); } fib(x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }");
-    assert (21, "main() { return add6(1,2,3,4,5,6); } add6(a,b,c,d,e,f) { return a+b+c+d+e+f; }");
+    assert (32, "int main() { return ret32(); } int ret32() { return 32; }");
+    assert (7, "int main() { return add2(3,4); } int add2(int x, int y) { return x+y; }");
+    assert (1, "int main() { return sub2(4,3); } int sub2(int x,int y) { return x-y; }");
+    assert (55, "int main() { return fib(9); } int fib(int x) { if (x<=1) return 1; return fib(x-1) + fib(x-2); }");
+    assert (21, "int main() { return add6(1,2,3,4,5,6); } int add6(int a,int b,int c,int d,int e,int f) { return a+b+c+d+e+f; }");
 
     // Pointer and address-of tests
-    assert(3, "main() { int a;a=3; return *&a; }");
-    assert(3, "main() { int a;int b;a=3; b=&a; return *b; }");
-    assert(5, "main() { int a;int b;a=3; b=&a; *b=5; return a; }");
-    assert(7, "main() { int a;int b;int c;a=3; b=&a; c=&b; **c=7; return a; }");
+    assert(3, "int main() { int a;a=3; return *&a; }");
+    assert(3, "int main() { int a;int b;a=3; b=&a; return *b; }");
+    assert(5, "int main() { int a;int b;a=3; b=&a; *b=5; return a; }");
+    assert(7, "int main() { int a;int b;int c;a=3; b=&a; c=&b; **c=7; return a; }");
 
     // Print summary
     printf("\n========================================\n");
