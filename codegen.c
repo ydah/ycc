@@ -2,29 +2,42 @@
 
 int label_count = 0;
 
-void gen_lval(Node* node) {
-    if (node->kind != NODE_LVAR)
+void gen_addr(Node* node) {
+    if (node->kind != NODE_VAR)
         error("Left side of assignment is not a variable");
 
-    printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", node->offset);
+    printf("  lea rax, [rbp-%d]\n", node->var->offset);
     printf("  push rax\n");
+}
+
+void load() {
+    printf("  pop rax\n");
+    printf("  mov rax, [rax]\n");
+    printf("  push rax\n");
+}
+
+void store() {
+    printf("  pop rdi\n");
+    printf("  pop rax\n");
+    printf("  mov [rax], rdi\n");
+    printf("  push rdi\n");
 }
 
 void gen(Node* node) {
     switch (node->kind) {
         case NODE_ASSIGN: {
-            gen_lval(node->lhs);
+            gen_addr(node->lhs);
             gen(node->rhs);
-
-            printf("  pop rdi\n");
-            printf("  pop rax\n");
-            printf("  mov [rax], rdi\n");
-            printf("  push rdi\n");
+            store();
             return;
         }
         case NODE_BLOCK: {
             for (Node* n = node->body; n; n = n->next) gen(n);
+            return;
+        }
+        case NODE_EXPR_STMT: {
+            gen(node->lhs);
+            printf("  add rsp, 8\n");
             return;
         }
         case NODE_FOR: {
@@ -84,11 +97,9 @@ void gen(Node* node) {
             printf(".Lend%d:\n", c);
             return;
         }
-        case NODE_LVAR: {
-            gen_lval(node);
-            printf("  pop rax\n");
-            printf("  mov rax, [rax]\n");
-            printf("  push rax\n");
+        case NODE_VAR: {
+            gen_addr(node);
+            load();
             return;
         }
         case NODE_NUM: {
@@ -98,9 +109,7 @@ void gen(Node* node) {
         case NODE_RETURN: {
             gen(node->lhs);
             printf("  pop rax\n");
-            printf("  mov rsp, rbp\n");
-            printf("  pop rbp\n");
-            printf("  ret\n");
+            printf("  jmp .Lreturn\n");
             return;
         }
         case NODE_WHILE: {
@@ -164,4 +173,24 @@ void gen(Node* node) {
     }
 
     printf("  push rax\n");
+}
+
+void codegen(Program* prog) {
+    printf(".intel_syntax noprefix\n");
+    printf(".global main\n");
+    printf("main:\n");
+
+    // Prologue
+    printf("  push rbp\n");
+    printf("  mov rbp, rsp\n");
+    printf("  sub rsp, %d\n", prog->stack_size);
+    printf("  mov rax, 0\n");
+
+    for (Node* node = prog->node; node; node = node->next) gen(node);
+
+    // Epilogue
+    printf(".Lreturn:\n");
+    printf("  mov rsp, rbp\n");
+    printf("  pop rbp\n");
+    printf("  ret\n");
 }

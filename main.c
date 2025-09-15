@@ -1,10 +1,5 @@
 #include "ycc.h"
 
-char* user_input;     // Input string
-Token* token;         // Current token
-Node* code[100];      // Abstract syntax tree
-LVar* locals = NULL;  // Local variable list
-
 int main(int argc, char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of arguments\n");
@@ -13,26 +8,15 @@ int main(int argc, char** argv) {
 
     user_input = argv[1];
     token = tokenize();
-    program();
+    Program* prog = program();
 
-    printf(".intel_syntax noprefix\n");
-    printf(".globl main\n");
-    printf("main:\n");
-
-    // Prologue
-    printf("  push rbp\n");
-    printf("  mov rbp, rsp\n");
-    printf("  sub rsp, 208\n");  // Allocate space for 26 variables
-
-    for (int i = 0; code[i]; i++) {
-        gen(code[i]);
-
-        printf("  pop rax\n");
+    int offset = 0;
+    for (Var* var = prog->locals; var; var = var->next) {
+        offset += 8;
+        var->offset = offset;
     }
+    prog->stack_size = offset;
 
-    // Epilogue
-    printf("  mov rsp, rbp\n");
-    printf("  pop rbp\n");
-    printf("  ret\n");
+    codegen(prog);
     return 0;
 }
