@@ -1,6 +1,6 @@
 #include "ycc.h"
 
-char* argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+char* argreg8[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 int label_count = 0;
 char* funcname;
@@ -86,7 +86,7 @@ void gen(Node* node) {
             }
 
             for (int i = 0; i < count && i < 6; i++) {
-                printf("  pop %s\n", argreg[i]);
+                printf("  pop %s\n", argreg8[i]);
             }
             // Align stack to 16 bytes
             int seq = label_count++;
@@ -227,7 +227,7 @@ void codegen(Function* prog) {
         int arg_offset = 0;
         for (VarList* vl = fn->params; vl; vl = vl->next) {
             Var* var = vl->var;
-            printf("  mov [rbp-%d], %s\n", var->offset, argreg[arg_offset++]);
+            printf("  mov [rbp-%d], %s\n", var->offset, argreg8[arg_offset++]);
         }
 
         for (Node* node = fn->node; node; node = node->next) gen(node);
