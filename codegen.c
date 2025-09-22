@@ -89,8 +89,20 @@ void gen(Node* node) {
             for (int i = 0; i < count && i < 6; i++) {
                 printf("  pop %s\n", argreg[i]);
             }
+            // Align stack to 16 bytes
+            int seq = label_count++;
+            printf("  mov rax, rsp\n");
+            printf("  and rax, 15\n");
+            printf("  jnz .Lcall%d\n", seq);
             printf("  mov rax, 0\n");
             printf("  call %s\n", node->funcname);
+            printf("  jmp .Lend%d\n", seq);
+            printf(".Lcall%d:\n", seq);
+            printf("  sub rsp, 8\n");
+            printf("  mov rax, 0\n");
+            printf("  call %s\n", node->funcname);
+            printf("  add rsp, 8\n");
+            printf(".Lend%d:\n", seq);
             printf("  push rax\n");
             return;
         }
