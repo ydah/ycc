@@ -85,7 +85,6 @@ void gen(Node* node) {
                 gen(args[i]);
             }
 
-            static char* argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
             for (int i = 0; i < count && i < 6; i++) {
                 printf("  pop %s\n", argreg[i]);
             }
