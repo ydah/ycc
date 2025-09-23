@@ -319,8 +319,13 @@ Node* mul() {
 /*
  * unary = ("+" | "-" | "&" | "*") unary
  *       | primary
+ *       | "sizeof" unary
  */
 Node* unary() {
+    if (consume("sizeof")) {
+        return new_unary(NODE_SIZEOF, unary());
+    }
+
     if (consume("+")) {
         return unary();
     }

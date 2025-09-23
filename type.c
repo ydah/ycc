@@ -13,6 +13,15 @@ Type* pointer_to(Type* base) {
     return ty;
 }
 
+int size_of(Type* ty) {
+    if (ty->kind == TYPE_INT)
+        return 4;
+    else if (ty->kind == TYPE_PTR)
+        return 8;
+    error("Unknown type");
+    return -1;
+}
+
 void visit(Node* node) {
     if (!node) return;
 
@@ -67,6 +76,12 @@ void visit(Node* node) {
             if (node->lhs->ty->kind != TYPE_PTR)
                 error("Invalid pointer dereference");
             node->ty = node->lhs->ty->base;
+            return;
+        case NODE_SIZEOF:
+            node->kind = NODE_NUM;
+            node->ty = int_type();
+            node->val = size_of(node->lhs->ty);
+            node->lhs = NULL;
             return;
     }
 }

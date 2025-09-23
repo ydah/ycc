@@ -44,6 +44,7 @@ typedef enum {
     NODE_ADDR,       // Address-of (&)
     NODE_DEREF,      // Dereference (*)
     NODE_NULL,       // Empty statement
+    NODE_SIZEOF,     // sizeof
 } NodeKind;
 
 typedef struct Node Node;
@@ -84,6 +85,7 @@ typedef enum {
     TOKEN_RESERVED,  // Symbol
     TOKEN_IDENT,     // Identifier
     TOKEN_NUM,       // Integer
+    TOKEN_SIZEOF,    // sizeof
     TOKEN_EOF,       // End of file
 } TokenKind;
 

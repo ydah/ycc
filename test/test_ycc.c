@@ -143,6 +143,11 @@ int main() {
     assert(4, "int main() { int* x; alloc4(&x, 1, 2, 3, 4); return *(x+3); }");
     assert(2, "int main() { int* x; alloc4(&x, 1, 2, 3, 4); return *(x+1); }");
 
+    // sizeof keyword tests
+    assert(4, "int main() { return sizeof(1); }");
+    assert(4, "int main() { int x; return sizeof(x); }");
+    assert(8, "int main() { int *x; return sizeof(x); }");
+
     // Print summary
     printf("\n========================================\n");
     printf("OK - All tests passed! (%d/%d)\n", passed_count, test_count);

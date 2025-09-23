@@ -103,7 +103,7 @@ bool is_alnum(char c) { return is_alpha(c) || ('0' <= c && c <= '9'); }
 bool starts_with(char* p, char* q) { return strncmp(p, q, strlen(q)) == 0; }
 
 char* starts_with_reserved(char* p) {
-    static char* kw[] = {"return", "if", "else", "while", "for", "int"};
+    static char* kw[] = {"return", "if", "else", "while", "for", "int", "sizeof"};
     for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++) {
         if (starts_with(p, kw[i]) && !is_alnum(p[strlen(kw[i])])) return kw[i];
     }
