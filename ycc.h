@@ -120,7 +120,7 @@ typedef enum { TYPE_INT, TYPE_PTR } TypeKind;
 
 struct Type {
     TypeKind kind;
-    struct Type* base; // Pointer to base type, e.g. int*
+    struct Type* base;  // Pointer to base type, e.g. int*
 };
 
 Type* int_type();
