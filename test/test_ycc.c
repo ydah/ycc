@@ -140,6 +140,8 @@ int main() {
     assert(7, "int main() { int x=3; int y=5; *(&x+1)=7; return y; }");
     assert(7, "int main() { int x=3; int y=5; *(&y-1)=7; return x; }");
     assert(8, "int main() { int x=3; int y=5; return z(&x, y); } int z(int *x, int y) { return *x + y; }");
+    assert(4, "int main() { int* x; alloc4(&x, 1, 2, 3, 4); return *(x+3); }");
+    assert(2, "int main() { int* x; alloc4(&x, 1, 2, 3, 4); return *(x+1); }");
 
     // Print summary
     printf("\n========================================\n");

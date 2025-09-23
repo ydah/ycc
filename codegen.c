@@ -1,5 +1,6 @@
 #include "ycc.h"
 
+char* argreg4[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 char* argreg8[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 int label_count = 0;
@@ -18,16 +19,22 @@ void gen_addr(Node* node) {
     error("Left side of assignment is not a variable");
 }
 
-void load() {
+void load(Type* ty) {
     printf("  pop rax\n");
-    printf("  mov rax, [rax]\n");
+    if (ty->kind == TYPE_INT)
+        printf("  movsxd rax, dword ptr [rax]\n");
+    else if (ty->kind == TYPE_PTR)
+        printf("  mov rax, [rax]\n");
     printf("  push rax\n");
 }
 
-void store() {
+void store(Type* ty) {
     printf("  pop rdi\n");
     printf("  pop rax\n");
-    printf("  mov [rax], rdi\n");
+    if (ty->kind == TYPE_INT)
+        printf("  mov [rax], edi\n");
+    else if (ty->kind == TYPE_PTR)
+        printf("  mov [rax], rdi\n");
     printf("  push rdi\n");
 }
 
@@ -40,7 +47,7 @@ void gen(Node* node) {
         case NODE_ASSIGN: {
             gen_addr(node->lhs);
             gen(node->rhs);
-            store();
+            store(node->ty);
             return;
         }
         case NODE_BLOCK: {
@@ -49,7 +56,7 @@ void gen(Node* node) {
         }
         case NODE_DEREF: {
             gen(node->lhs);
-            load();
+            load(node->ty);
             return;
         }
         case NODE_EXPR_STMT: {
@@ -153,7 +160,7 @@ void gen(Node* node) {
         }
         case NODE_VAR: {
             gen_addr(node);
-            load();
+            load(node->ty);
             return;
         }
     }
@@ -166,13 +173,23 @@ void gen(Node* node) {
 
     switch (node->kind) {
         case NODE_ADD:
-            if (node->ty->kind == TYPE_PTR)
-                printf("  imul rdi, 8\n");
+            if (node->ty->kind == TYPE_PTR) {
+                if (node->ty->base->kind == TYPE_INT) {
+                    printf("  imul rdi, 4\n");
+                } else if (node->ty->base->kind == TYPE_PTR) {
+                    printf("  imul rdi, 8\n");
+                }
+            }
             printf("  add rax, rdi\n");
             break;
         case NODE_SUB:
-            if (node->ty->kind == TYPE_PTR)
-                printf("  imul rdi, 8\n");
+            if (node->ty->kind == TYPE_PTR) {
+                if (node->ty->base->kind == TYPE_INT) {
+                    printf("  imul rdi, 4\n");
+                } else if (node->ty->base->kind == TYPE_PTR) {
+                    printf("  imul rdi, 8\n");
+                }
+            }
             printf("  sub rax, rdi\n");
             break;
         case NODE_MUL:
@@ -227,7 +244,10 @@ void codegen(Function* prog) {
         int arg_offset = 0;
         for (VarList* vl = fn->params; vl; vl = vl->next) {
             Var* var = vl->var;
-            printf("  mov [rbp-%d], %s\n", var->offset, argreg8[arg_offset++]);
+            if (var->ty->kind == TYPE_INT)
+                printf("  mov [rbp-%d], %s\n", var->offset, argreg4[arg_offset++]);
+            else if (var->ty->kind == TYPE_PTR)
+                printf("  mov [rbp-%d], %s\n", var->offset, argreg8[arg_offset++]);
         }
 
         for (Node* node = fn->node; node; node = node->next) gen(node);
