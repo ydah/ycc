@@ -172,6 +172,7 @@ int main() {
     assert(4, "int main() { int x[2][3]; int *y=x; y[4]=4; return x[1][1]; }");
     assert(5, "int main() { int x[2][3]; int *y=x; y[5]=5; return x[1][2]; }");
     assert(6, "int main() { int x[2][3]; int *y=x; y[6]=6; return x[2][0]; }");
+    assert(3, "int main() { int x[2]; *x=1; *(x+1)=2; int *y; y=x; return *y + *(y+1); }");
 
     // Print summary
     printf("\n========================================\n");
