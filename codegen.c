@@ -63,8 +63,7 @@ void gen(Node* node) {
         }
         case NODE_DEREF: {
             gen(node->lhs);
-            if (node->ty->kind != TYPE_ARRAY)
-                load(node->ty);
+            if (node->ty->kind != TYPE_ARRAY) load(node->ty);
             return;
         }
         case NODE_EXPR_STMT: {
@@ -168,8 +167,7 @@ void gen(Node* node) {
         }
         case NODE_VAR: {
             gen_addr(node);
-            if (node->ty->kind != TYPE_ARRAY)
-                load(node->ty);
+            if (node->ty->kind != TYPE_ARRAY) load(node->ty);
             return;
         }
     }
@@ -244,9 +242,11 @@ void codegen(Function* prog) {
         for (VarList* vl = fn->params; vl; vl = vl->next) {
             Var* var = vl->var;
             if (var->ty->kind == TYPE_INT)
-                printf("  mov [rbp-%d], %s\n", var->offset, argreg4[arg_offset++]);
+                printf("  mov [rbp-%d], %s\n", var->offset,
+                       argreg4[arg_offset++]);
             else if (var->ty->kind == TYPE_PTR)
-                printf("  mov [rbp-%d], %s\n", var->offset, argreg8[arg_offset++]);
+                printf("  mov [rbp-%d], %s\n", var->offset,
+                       argreg8[arg_offset++]);
         }
 
         for (Node* node = fn->node; node; node = node->next) gen(node);

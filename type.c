@@ -67,13 +67,11 @@ void visit(Node* node) {
                 node->lhs = node->rhs;
                 node->rhs = tmp;
             }
-            if (node->rhs->ty->base)
-                error("Invalid pointer arithmetic");
+            if (node->rhs->ty->base) error("Invalid pointer arithmetic");
             node->ty = node->lhs->ty;
             return;
         case NODE_SUB:
-            if (node->rhs->ty->base)
-                error("Invalid pointer arithmetic");
+            if (node->rhs->ty->base) error("Invalid pointer arithmetic");
             node->ty = node->lhs->ty;
             return;
         case NODE_ASSIGN:
@@ -86,8 +84,7 @@ void visit(Node* node) {
                 node->ty = pointer_to(node->lhs->ty);
             return;
         case NODE_DEREF:
-            if (!node->lhs->ty->base)
-                error("Invalid pointer dereference");
+            if (!node->lhs->ty->base) error("Invalid pointer dereference");
             node->ty = node->lhs->ty->base;
             return;
         case NODE_SIZEOF:
