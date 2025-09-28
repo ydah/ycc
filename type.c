@@ -13,11 +13,21 @@ Type* pointer_to(Type* base) {
     return ty;
 }
 
+Type* array_of(Type* base, int size) {
+    Type* ty = calloc(1, sizeof(Type));
+    ty->kind = TYPE_ARRAY;
+    ty->base = base;
+    ty->array_size = size;
+    return ty;
+}
+
 int size_of(Type* ty) {
     if (ty->kind == TYPE_INT)
         return 4;
     else if (ty->kind == TYPE_PTR)
         return 8;
+    else if (ty->kind == TYPE_ARRAY)
+        return size_of(ty->base) * ty->array_size;
     error("Unknown type");
     return -1;
 }
@@ -52,17 +62,17 @@ void visit(Node* node) {
             node->ty = node->var->ty;
             return;
         case NODE_ADD:
-            if (node->rhs->ty->kind == TYPE_PTR) {
+            if (node->rhs->ty->base) {
                 Node* tmp = node->lhs;
                 node->lhs = node->rhs;
                 node->rhs = tmp;
             }
-            if (node->rhs->ty->kind == TYPE_PTR)
+            if (node->rhs->ty->base)
                 error("Invalid pointer arithmetic");
             node->ty = node->lhs->ty;
             return;
         case NODE_SUB:
-            if (node->rhs->ty->kind == TYPE_PTR)
+            if (node->rhs->ty->base)
                 error("Invalid pointer arithmetic");
             node->ty = node->lhs->ty;
             return;
@@ -70,10 +80,13 @@ void visit(Node* node) {
             node->ty = node->lhs->ty;
             return;
         case NODE_ADDR:
-            node->ty = pointer_to(node->lhs->ty);
+            if (node->lhs->ty->kind == TYPE_ARRAY)
+                node->ty = pointer_to(node->lhs->ty->base);
+            else
+                node->ty = pointer_to(node->lhs->ty);
             return;
         case NODE_DEREF:
-            if (node->lhs->ty->kind != TYPE_PTR)
+            if (!node->lhs->ty->base)
                 error("Invalid pointer dereference");
             node->ty = node->lhs->ty->base;
             return;

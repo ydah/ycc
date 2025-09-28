@@ -118,14 +118,17 @@ extern char* user_input;  // Input string
 
 /// type.c
 
-typedef enum { TYPE_INT, TYPE_PTR } TypeKind;
+typedef enum { TYPE_INT, TYPE_PTR, TYPE_ARRAY } TypeKind;
 
 struct Type {
     TypeKind kind;
     struct Type* base;  // Pointer to base type, e.g. int*
+    int array_size;     // Array size if the type is an array
 };
 
 Type* int_type();
+int size_of(Type* ty);
+Type* array_of(Type* base, int size);
 Type* pointer_to(Type* base);
 void add_type(Function* prog);
 

@@ -19,6 +19,13 @@ void gen_addr(Node* node) {
     error("Left side of assignment is not a variable");
 }
 
+void gen_lval(Node* node) {
+    if (node->ty->kind == TYPE_ARRAY) {
+        error("Not an lvalue");
+    }
+    gen_addr(node);
+}
+
 void load(Type* ty) {
     printf("  pop rax\n");
     if (ty->kind == TYPE_INT)
@@ -45,7 +52,7 @@ void gen(Node* node) {
             return;
         }
         case NODE_ASSIGN: {
-            gen_addr(node->lhs);
+            gen_lval(node->lhs);
             gen(node->rhs);
             store(node->ty);
             return;
@@ -56,7 +63,8 @@ void gen(Node* node) {
         }
         case NODE_DEREF: {
             gen(node->lhs);
-            load(node->ty);
+            if (node->ty->kind != TYPE_ARRAY)
+                load(node->ty);
             return;
         }
         case NODE_EXPR_STMT: {
@@ -160,7 +168,8 @@ void gen(Node* node) {
         }
         case NODE_VAR: {
             gen_addr(node);
-            load(node->ty);
+            if (node->ty->kind != TYPE_ARRAY)
+                load(node->ty);
             return;
         }
     }
@@ -173,23 +182,13 @@ void gen(Node* node) {
 
     switch (node->kind) {
         case NODE_ADD:
-            if (node->ty->kind == TYPE_PTR) {
-                if (node->ty->base->kind == TYPE_INT) {
-                    printf("  imul rdi, 4\n");
-                } else if (node->ty->base->kind == TYPE_PTR) {
-                    printf("  imul rdi, 8\n");
-                }
-            }
+            if (node->ty->base)
+                printf("  imul rdi, %d\n", size_of(node->ty->base));
             printf("  add rax, rdi\n");
             break;
         case NODE_SUB:
-            if (node->ty->kind == TYPE_PTR) {
-                if (node->ty->base->kind == TYPE_INT) {
-                    printf("  imul rdi, 4\n");
-                } else if (node->ty->base->kind == TYPE_PTR) {
-                    printf("  imul rdi, 8\n");
-                }
-            }
+            if (node->ty->base)
+                printf("  imul rdi, %d\n", size_of(node->ty->base));
             printf("  sub rax, rdi\n");
             break;
         case NODE_MUL:
