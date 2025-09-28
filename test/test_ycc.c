@@ -175,6 +175,16 @@ int main() {
     assert(6, "int main() { int x[2][3]; int *y=x; y[6]=6; return x[2][0]; }");
     assert(3, "int main() { int x[2]; *x=1; *(x+1)=2; int *y; y=x; return *y + *(y+1); }");
 
+    // Global variables
+    assert(0, "int x; int main() { return x; }");
+    assert(3, "int x; int main() { x=3; return x; }");
+    assert(0, "int x[4]; int main() { x[0]=0; x[1]=1; x[2]=2; x[3]=3; return x[0]; }");
+    assert(1, "int x[4]; int main() { x[0]=0; x[1]=1; x[2]=2; x[3]=3; return x[1]; }");
+    assert(2, "int x[4]; int main() { x[0]=0; x[1]=1; x[2]=2; x[3]=3; return x[2]; }");
+    assert(3, "int x[4]; int main() { x[0]=0; x[1]=1; x[2]=2; x[3]=3; return x[3]; }");
+    assert(4, "int x; int main() { return sizeof(x); }");
+    assert(16, "int x[4]; int main() { return sizeof(x); }");
+
     // Print summary
     printf("\n========================================\n");
     printf("OK - All tests passed! (%d/%d)\n", passed_count, test_count);

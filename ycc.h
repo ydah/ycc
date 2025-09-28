@@ -11,9 +11,11 @@ typedef struct Type Type;
 
 typedef struct Var Var;
 struct Var {
-    char* name;  // Variable name
+    char* name;     // Variable name
+    Type* ty;       // Type of the variable
+    bool is_local;  // Local or global
+
     int offset;  // Offset from RBP
-    Type* ty;    // Type of the variable
 };
 
 typedef struct VarList VarList;
@@ -77,7 +79,13 @@ struct Function {
     int stack_size;   // Total stack size needed for locals
 };
 
-Function* program();
+typedef struct Program Program;
+struct Program {
+    VarList* globals;  // Global variables
+    Function* funcs;   // Functions
+};
+
+Program* program();
 
 // tokenize.c
 
@@ -130,9 +138,9 @@ Type* int_type();
 int size_of(Type* ty);
 Type* array_of(Type* base, int size);
 Type* pointer_to(Type* base);
-void add_type(Function* prog);
+void add_type(Program* prog);
 
 /// codegen.c
 
-void codegen(Function* prog);
+void codegen(Program* prog);
 void gen(Node* node);
