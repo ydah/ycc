@@ -165,6 +165,7 @@ int main() {
     assert(5, "int main() { int x[3]; *x=3; x[1]=4; x[2]=5; return *(x+2); }");
     assert(5, "int main() { int x[3]; *x=3; x[1]=4; x[2]=5; return *(x+2); }");
     assert(5, "int main() { int x[3]; *x=3; x[1]=4; 2[x]=5; return *(x+2); }");
+    assert(5, "int main() { int x[3]; *x=3; x[1]=4; 2[x]=5; return 2[x]; }");
     assert(0, "int main() { int x[2][3]; int *y=x; y[0]=0; return x[0][0]; }");
     assert(1, "int main() { int x[2][3]; int *y=x; y[1]=1; return x[0][1]; }");
     assert(2, "int main() { int x[2][3]; int *y=x; y[2]=2; return x[0][2]; }");
